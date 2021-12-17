@@ -67,11 +67,12 @@ class GeofenceManager(context: Context,
 
     private val geofencePendingIntent: PendingIntent by lazy {
         val intent = Intent(context, GeofenceBroadcastReceiver::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
+        val flag = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         } else {
-            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            PendingIntent.FLAG_UPDATE_CURRENT
         }
+        PendingIntent.getBroadcast(context, 0, intent, flag)
     }
 
 
@@ -107,7 +108,7 @@ class GeofenceManager(context: Context,
     private fun getGeofencingRequest(geofence: Geofence): GeofencingRequest {
         val geofenceList = listOf(geofence)
         return GeofencingRequest.Builder().apply {
-            setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+            setInitialTrigger(0)
             addGeofences(geofenceList)
         }.build()
     }
